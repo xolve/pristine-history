@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Pristine History — Options</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Pristine History</h1>
+      <p class="subtitle">
+        URLs matching any pattern below will be removed from browser history
+        immediately after they are visited.
+      </p>
+
+      <section id="pattern-section">
+        <h2>URL Patterns</h2>
+
+        <div class="add-row">
+          <input
+            id="new-pattern"
+            type="text"
+            placeholder="e.g. ^https://(www\.)?example\.com/"
+            spellcheck="false"
+            autocomplete="off"
+          />
+          <button id="add-btn" type="button">Add</button>
+        </div>
+        <p id="add-error" class="error" hidden></p>
+
+        <ul id="pattern-list"></ul>
+        <p id="empty-msg" class="muted">No patterns configured yet.</p>
+      </section>
+
+      <section id="test-section">
+        <h2>Test a URL</h2>
+        <div class="add-row">
+          <input
+            id="test-url"
+            type="text"
+            placeholder="https://example.com/page"
+            spellcheck="false"
+            autocomplete="off"
+          />
+          <button id="test-btn" type="button">Test</button>
+        </div>
+        <p id="test-result" hidden></p>
+      </section>
+    </main>
+
+    <script src="options.js"></script>
+  </body>
+</html>
