@@ -1,12 +1,6 @@
 # Pristine History
 
-A cross-browser WebExtension (Manifest V3) that automatically removes history entries for URLs matching user-defined regex patterns.
-
-## How It Works
-
-The addon listens for `history.onVisited` events and immediately calls `history.deleteUrl()` for any URL matching your configured patterns. Entries may appear briefly before removal — the WebExtensions API does not allow preventing history creation, only reacting to it.
-
-> **Note:** `deleteUrl()` removes *all* visits for a matching URL, not just the latest one. This is by design for privacy tooling.
+A Firefox WebExtension (Manifest V3) that automatically removes history entries for URLs matching user-defined regex patterns.
 
 ## Features
 
@@ -18,43 +12,7 @@ The addon listens for `history.onVisited` events and immediately calls `history.
 
 ## Browser Compatibility
 
-| Browser | Version | Status |
-|---------|---------|--------|
-| Chrome  | 102+    | ✅ Supported |
-| Edge    | 102+    | ✅ Supported |
-| Firefox | 121+    | ✅ Supported (MV3 service worker) |
-| Chromium forks (Brave, Vivaldi, etc.) | MV3 support required | ✅ Supported |
-
-## Development
-
-### Prerequisites
-
-- Node.js 18+
-- `zip` command (for packaging only)
-
-### Build
-
-```bash
-npm install
-npm run build        # compile TypeScript → dist/
-npm run typecheck    # type-check without emitting
-npm run package      # build + create pristine-history.zip
-npm run clean        # remove dist/ and zip
-```
-
-### Installation (from source)
-
-Build first with `npm run build`, then load the `dist/` directory:
-
-**Chrome / Edge / Chromium:**
-1. Navigate to `chrome://extensions` (or `edge://extensions`)
-2. Enable **Developer mode**
-3. Click **Load unpacked** and select the `dist/` directory
-
-**Firefox:**
-1. Navigate to `about:debugging#/runtime/this-firefox`
-2. Click **Load Temporary Add-on…**
-3. Select `manifest.json` from the `dist/` directory
+Firefox is the current target. The build uses `background.scripts` in its Manifest V3 manifest. This repository does not produce a build for Chrome, Edge, or other Chromium browsers.
 
 ## Usage
 
@@ -91,25 +49,3 @@ User-provided patterns are validated before saving:
   - Backreferences like `\1`
   - Overlapping alternation with quantifiers like `(.*|.*)+`
 - Invalid regex syntax is caught at compile time
-
-## File Structure
-
-```
-├── src/
-│   ├── api.ts             # Browser API abstraction (Chrome/Firefox)
-│   ├── background.ts      # Service worker — core history deletion logic
-│   ├── regex-validator.ts  # Shared regex validation (ReDoS prevention)
-│   ├── options.ts          # Pattern management UI logic
-│   └── popup.ts            # Toolbar popup logic (toggle + status)
-├── manifest.json          # Extension manifest (MV3)
-├── options.html/css       # Pattern management UI
-├── popup.html/css         # Toolbar popup UI
-├── icons/                 # Extension icons
-├── build.mjs              # esbuild build script
-├── tsconfig.json          # TypeScript configuration
-└── package.json           # Dependencies and scripts
-```
-
-## License
-
-MIT

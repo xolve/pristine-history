@@ -130,6 +130,20 @@ describe("ReDoS — dangerous constructs", () => {
     assert.equal(r.valid, false);
     assert.match(r.error!, /catastrophic backtracking/i);
   });
+
+  it("rejects named and forward backreferences", () => {
+    for (const pattern of [String.raw`(?<letter>.)\k<letter>`, String.raw`\1(.)`]) {
+      const r = validatePattern(pattern);
+      assert.equal(r.valid, false);
+      assert.match(r.error!, /backreference/i);
+    }
+  });
+
+  it("doesn't mistake literal escapes for backreferences", () => {
+    for (const pattern of [String.raw`(.)\\1`, String.raw`(.)[\1]`, String.raw`(.)\141`, String.raw`(?<=.)\1`]) {
+      assert.equal(validatePattern(pattern).valid, true, pattern);
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------

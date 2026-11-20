@@ -10,7 +10,7 @@
     "clean": "rm -rf dist pristine-history.zip",
     "test": "node --import tsx --test src/__tests__/*.test.ts",
     "test:unit": "node --import tsx --test src/__tests__/regex-validator.test.ts src/__tests__/pattern-matching.test.ts",
-    "test:integration": "node --import tsx --test src/__tests__/background.test.ts src/__tests__/popup.test.ts src/__tests__/popup-refresh.test.ts src/__tests__/popup-singular.test.ts src/__tests__/options.test.ts"
+    "test:integration": "node --import tsx --test src/__tests__/background*.test.ts src/__tests__/popup*.test.ts"
   },
   "devDependencies": {
     "@types/webextension-polyfill": "^0.12.5",

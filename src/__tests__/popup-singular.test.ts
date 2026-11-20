@@ -19,7 +19,7 @@ document.body.innerHTML = `
   <button id="options-btn" type="button">Manage Patterns</button>
 `;
 
-(globalThis as any).chrome = {
+const browser = {
   storage: {
     local: {
       get: mock.fn(async () => ({ patterns: ["abc"], enabled: true })),
@@ -27,15 +27,17 @@ document.body.innerHTML = `
     },
   },
   runtime: {
+    id: "pristine-history-test",
     openOptionsPage: mock.fn(),
   },
 };
+Object.assign(globalThis, { chrome: { runtime: browser.runtime }, browser });
 
 const count = document.getElementById("pattern-count")!;
 
 before(async () => {
   await import("../popup");
-  await new Promise((r) => setTimeout(r, 15));
+  await new Promise<void>((resolve) => setImmediate(resolve));
 });
 
 after(async () => {

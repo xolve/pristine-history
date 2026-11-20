@@ -1,11 +1,12 @@
 # 🧪 Pristine History — Test Plan
 
+Use Firefox for browser checks. See [the manual test plan](MANUAL_TEST_PLAN.md) for steps.
+
 ## 1. Installation & Loading
 | # | Test Case | Steps | Expected |
 |---|-----------|-------|----------|
-| 1.1 | Load in Chrome/Edge | Load `dist/` as unpacked extension | Extension icon appears, no console errors |
-| 1.2 | Load in Firefox | Load via `about:debugging` | Same as above |
-| 1.3 | Icons display | Check toolbar and `chrome://extensions` | 48px and 128px icons render correctly |
+| 1.2 | Load in Firefox | Load `dist/manifest.json` via `about:debugging` | Extension icon appears, no load errors |
+| 1.3 | Icons display | Check toolbar and `about:addons` | 48px and 128px icons render correctly |
 
 ## 2. Popup (Toggle & Status)
 | # | Test Case | Steps | Expected |
@@ -57,15 +58,15 @@
 ## 6. Core Functionality — History Deletion
 | # | Test Case | Steps | Expected |
 |---|-----------|-------|----------|
-| 6.1 | Basic deletion | Add pattern `^https://example\.com/`, visit `https://example.com/page` | URL does **not** persist in `chrome://history` |
+| 6.1 | Basic deletion | Add pattern `^https://example\.com/`, visit `https://example.com/page` | URL does **not** persist in Firefox history |
 | 6.2 | Non-matching URL | Visit a URL that doesn't match any pattern | URL **does** persist in history |
 | 6.3 | Disabled state | Disable via popup → visit matching URL | URL persists in history (not deleted) |
 | 6.4 | Re-enable | Re-enable → visit matching URL | URL is deleted again |
 | 6.5 | Multiple patterns | Add 3 patterns → visit URLs matching different ones | All matching URLs deleted |
 | 6.6 | Partial URL match | Pattern `utm_` → visit `https://foo.com/?utm_source=bar` | URL deleted |
-| 6.7 | All visits removed | Visit same matching URL 5 times, pattern added after | `deleteUrl()` removes all visits for that URL |
-| 6.8 | Dedup / rapid revisits | Visit same matching URL multiple times within 2 seconds | Only one `deleteUrl()` call (check console for no duplicate warns) |
-| 6.9 | Redirect chain dedup | URL that redirects through matching URL | Dedup prevents redundant delete calls |
+| 6.7 | All visits removed | Disable, visit a matching URL repeatedly, then re-enable and visit that exact URL again | `deleteUrl()` removes all visits for that URL |
+| 6.8 | Revisits after deletion | Visit a matching URL again after its first deletion completes | The new visit is removed too |
+| 6.9 | Redirect chain | Visit a URL that redirects to a matching URL | The matching final URL does not persist in history |
 | 6.10 | Pattern added at runtime | Add new pattern while extension running → visit matching URL | New pattern takes effect without restart |
 | 6.11 | Pattern removed at runtime | Remove pattern → visit previously-matching URL | URL now persists in history |
 
@@ -75,14 +76,13 @@
 | 7.1 | Special regex chars in URL | Pattern `\?q=` → visit `https://google.com?q=test` | Matches and deletes |
 | 7.2 | Unicode URL | Visit URL with unicode chars matching a pattern | Handled correctly |
 | 7.3 | Very long URL | Visit URL >2000 chars matching pattern | Deleted without errors |
-| 7.4 | about: / chrome: URLs | These don't fire `onVisited` | No errors, no action |
-| 7.5 | Extension survives restart | Restart browser with extension installed | Patterns and enabled state persist, listener re-registers |
+| 7.4 | Firefox internal pages | Open `about:config` and `about:addons` | No background errors |
+| 7.5 | Extension survives restart | Restart Firefox with a persistently installed build, not a temporary add-on | Settings persist and matching visits are deleted after re-enabling |
 | 7.6 | Storage change from another context | Edit storage in devtools → check background | `onChanged` listener picks up changes |
 | 7.7 | File extension pattern | Pattern `\.(pdf\|docx?)$` → test URL ending `.pdf` | Matches correctly |
 
-## 8. Cross-Browser
+## 8. Firefox Background
 | # | Test Case | Steps | Expected |
 |---|-----------|-------|----------|
-| 8.1 | Chrome API path | Verify `chrome.history`, `chrome.storage.local` work | Functional |
-| 8.2 | Firefox API path | Same test on Firefox | `browser.*` namespace works via the `api.ts` shim |
-| 8.3 | Service worker lifecycle (Chrome) | Leave extension idle for 5 min → visit matching URL | Service worker wakes, `refreshCache()` runs, deletion works |
+| 8.2 | Firefox end-to-end | Add or remove patterns, toggle deletion, and visit matching and non-matching URLs | UI settings persist and history reflects the current settings |
+| 8.3 | Background reload | Click **Reload** in `about:debugging`, then visit a matching URL | The background loads saved settings and removes the matching visit |

@@ -22,7 +22,7 @@ document.body.innerHTML = `
 `;
 
 // ---------------------------------------------------------------------------
-// Mock chrome API
+// Mock browser API
 // ---------------------------------------------------------------------------
 
 // Storage data that storage.local.get returns.
@@ -33,7 +33,7 @@ const storageSetMock = mock.fn(async (items: Record<string, unknown>) => {
   Object.assign(storedData, items);
 });
 
-(globalThis as any).chrome = {
+const browser = {
   storage: {
     local: {
       get: mock.fn(async (defaults: Record<string, unknown>) => {
@@ -47,9 +47,12 @@ const storageSetMock = mock.fn(async (items: Record<string, unknown>) => {
     },
   },
   runtime: {
+    id: "pristine-history-test",
     openOptionsPage: openOptionsPageMock,
   },
 };
+// The polyfill checks chrome.runtime.id before using the promise-based browser API.
+Object.assign(globalThis, { chrome: { runtime: browser.runtime }, browser });
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -63,7 +66,7 @@ const optionsBtn = document.getElementById("options-btn")!;
 // Import popup module — this runs refresh() which is async.
 before(async () => {
   await import("../popup");
-  await new Promise((r) => setTimeout(r, 15));
+  await new Promise<void>((resolve) => setImmediate(resolve));
 });
 
 after(async () => {

@@ -31,7 +31,7 @@ const storedData: Record<string, unknown> = {
   enabled: false,
 };
 
-(globalThis as any).chrome = {
+const browser = {
   storage: {
     local: {
       get: mock.fn(async (defaults: Record<string, unknown>) => {
@@ -45,9 +45,11 @@ const storedData: Record<string, unknown> = {
     },
   },
   runtime: {
+    id: "pristine-history-test",
     openOptionsPage: mock.fn(),
   },
 };
+Object.assign(globalThis, { chrome: { runtime: browser.runtime }, browser });
 
 const toggle = document.getElementById("toggle") as unknown as HTMLInputElement;
 const label = document.getElementById("status-label")!;
@@ -55,7 +57,7 @@ const count = document.getElementById("pattern-count")!;
 
 before(async () => {
   await import("../popup");
-  await new Promise((r) => setTimeout(r, 15));
+  await new Promise<void>((resolve) => setImmediate(resolve));
 });
 
 after(async () => {
